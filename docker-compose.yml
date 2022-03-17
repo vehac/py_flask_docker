@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  redis:
+    container_name: py_flask_redis
+    image: redis:alpine
+    networks:
+        backend-pyf-net:
+            ipv4_address: 28.21.112.5
+  server:
+    build:    
+      context: ./
+      dockerfile: Dockerfile
+    container_name: py_flask_server
+    ports:
+      - 8008:5000
+    environment:
+      FLASK_ENV: development
+    networks:
+        backend-pyf-net:
+            ipv4_address: 28.21.112.4
+    depends_on:
+      - redis
+    volumes:
+      - ./:/usr/src/app
+    command: flask run
+
+networks:
+    backend-pyf-net:
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                - subnet: 28.21.112.0/26
